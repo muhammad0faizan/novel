@@ -2558,3 +2558,261 @@ select {
         max-width: 260px;
     }
 }
+
+
+/* =========================================================
+   CASH ON DELIVERY WARNING MODAL
+========================================================= */
+
+.cod-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 6000;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px;
+}
+
+.cod-modal.active {
+    display: flex;
+}
+
+.cod-backdrop {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(2, 9, 18, 0.88);
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.cod-modal-content {
+    position: relative;
+    z-index: 2;
+
+    width: min(100%, 500px);
+
+    padding: 38px 32px 30px;
+
+    text-align: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            #102943,
+            #081a2f
+        );
+
+    border: 1px solid rgba(215, 181, 109, 0.25);
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 30px 100px rgba(0, 0, 0, 0.65);
+
+    animation: codModalIn 0.28s ease;
+}
+
+@keyframes codModalIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+
+/* WARNING ICON */
+
+.cod-warning-icon {
+    width: 64px;
+    height: 64px;
+
+    display: grid;
+    place-items: center;
+
+    margin: 0 auto 18px;
+
+    border: 1px solid var(--gold);
+
+    border-radius: 50%;
+
+    color: var(--gold-light);
+
+    font-size: 28px;
+    font-weight: 800;
+
+    background: rgba(215, 181, 109, 0.06);
+}
+
+
+/* CLOSE BUTTON */
+
+.cod-close {
+    position: absolute;
+
+    top: 14px;
+    right: 15px;
+
+    width: 34px;
+    height: 34px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: var(--text-muted);
+
+    font-size: 22px;
+
+    line-height: 1;
+
+    transition: 0.3s ease;
+}
+
+.cod-close:hover {
+    border-color: var(--gold);
+    color: var(--gold-light);
+}
+
+
+/* TITLE */
+
+.cod-modal-content h2 {
+    margin: 10px 0 13px;
+
+    color: var(--white);
+
+    font-size: clamp(22px, 5vw, 29px);
+
+    line-height: 1.25;
+}
+
+
+/* DESCRIPTION */
+
+.cod-modal-content > p {
+    max-width: 420px;
+
+    margin: 0 auto;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    line-height: 1.8;
+}
+
+.cod-modal-content > p strong {
+    color: var(--gold-light);
+}
+
+
+/* QUESTION */
+
+.cod-modal-content .cod-question {
+    margin-top: 18px;
+
+    color: var(--white);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* BUTTONS */
+
+.cod-actions {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 11px;
+
+    margin-top: 25px;
+}
+
+.cod-btn {
+    min-height: 48px;
+
+    padding: 0 18px;
+
+    border-radius: 9px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition: 0.3s ease;
+}
+
+.cod-btn-cancel {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    background: rgba(255, 255, 255, 0.03);
+
+    color: var(--white);
+}
+
+.cod-btn-cancel:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.cod-btn-continue {
+    border: 1px solid var(--gold);
+
+    background: var(--gold);
+
+    color: #081525;
+}
+
+.cod-btn-continue:hover {
+    background: var(--gold-light);
+
+    border-color: var(--gold-light);
+
+    transform: translateY(-2px);
+}
+
+
+/* MOBILE */
+
+@media (max-width: 500px) {
+
+    .cod-modal {
+        padding: 14px;
+    }
+
+    .cod-modal-content {
+        padding: 36px 20px 24px;
+
+        border-radius: 21px;
+    }
+
+    .cod-warning-icon {
+        width: 58px;
+        height: 58px;
+
+        font-size: 25px;
+    }
+
+    .cod-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .cod-btn {
+        width: 100%;
+    }
+
+}
