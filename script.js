@@ -3,61 +3,47 @@
    JAVASCRIPT
 ========================================================= */
 
-
-/* =========================================================
-   WEBSITE CONFIGURATION
-   صرف یہ values بعد میں اپنی اصل details سے replace کرنی ہیں
-========================================================= */
+// ================================
+// WALI MUHAMMAD — WEBSITE SCRIPT
+// ================================
 
 const CONFIG = {
-
-    // Novel pricing
     bookPrice: 1999,
     originalPrice: 2600,
 
-    // WhatsApp number
-    // Example: 923001234567
     whatsappNumber: "923XXXXXXXXX",
-
-    // Author Instagram
     instagramUsername: "itsmuhammadfaizan_",
-
-    // Author Gmail
     email: "your-email@gmail.com",
 
-    // Google Apps Script Web App URL
-    // بعد میں یہاں اپنی Google Apps Script URL لگائیں گے
-    googleScriptURL: "https://script.google.com/macros/s/AKfycbzE8nneKtC21jXg8IhEYXnvqqyU8OvwMIOWFbnrCmcPF9KNNsGHc5zJddAwf-mG2uDxJw/exec",
+    googleScriptURL:
+        "https://script.google.com/macros/s/AKfycbzE8nneKtC21jXg8IhEYXnvqqyU8OvwMIOWFbnrCmcPF9KNNsGHc5zJddAwf-mG2uDxJw/exec",
 
-    // Bank details
     bankName: "United Bank Limited (UBL)",
     accountTitle: "Muhammad Faizan",
     accountNumber: "0998335726428",
     iban: "PK32UNIL0109000335726428",
 
-    // PDF links
-    pdfUrdu: "https://drive.google.com/file/d/1s0UkrjSdFMRVGYAhynfW-zTEktzV773S/view?usp=drivesdk",
+    pdfUrdu:
+        "https://drive.google.com/file/d/1s0UkrjSdFMRVGYAhynfW-zTEktzV773S/view?usp=drivesdk",
+
     pdfEnglish: "#",
     pdfRomanUrdu: "#"
 };
 
 
-/* =========================================================
-   DOM ELEMENTS
-========================================================= */
+// ================================
+// DOM ELEMENTS
+// ================================
 
 const orderForm = document.getElementById("orderForm");
 
 const quantityInput = document.getElementById("quantity");
-
 const totalPriceInput = document.getElementById("totalPrice");
 
 const summaryQuantity = document.getElementById("summaryQuantity");
-
 const summaryTotal = document.getElementById("summaryTotal");
 
 const orderModal = document.getElementById("orderModal");
-
 const closeModal = document.getElementById("closeModal");
 
 const generatedOrderCode =
@@ -82,11 +68,31 @@ const currentYear =
     document.getElementById("currentYear");
 
 
-/* =========================================================
-   PAGE INITIALIZATION
-========================================================= */
+// ================================
+// COD WARNING MODAL
+// ================================
 
-document.addEventListener("DOMContentLoaded", () => {
+const codWarningModal =
+    document.getElementById("codWarningModal");
+
+const codCancel =
+    document.getElementById("codCancel");
+
+const codCancelTop =
+    document.getElementById("codCancelTop");
+
+const codContinue =
+    document.getElementById("codContinue");
+
+let codConfirmed = false;
+let isSubmitting = false;
+
+
+// ================================
+// INITIALIZE WEBSITE
+// ================================
+
+document.addEventListener("DOMContentLoaded", function () {
 
     initializeWebsite();
 
@@ -96,321 +102,227 @@ document.addEventListener("DOMContentLoaded", () => {
 function initializeWebsite() {
 
     updatePrice();
-
     updateContactLinks();
-
     updateBankDetails();
-
     updatePDFLinks();
-
     setCurrentYear();
 
 }
 
 
-/* =========================================================
-   CURRENT YEAR
-========================================================= */
-
-function setCurrentYear() {
-
-    if (currentYear) {
-
-        currentYear.textContent =
-            new Date().getFullYear();
-
-    }
-
-}
-
-
-/* =========================================================
-   PRICE CALCULATION
-========================================================= */
+// ================================
+// PRICE CALCULATION
+// ================================
 
 function updatePrice() {
 
     if (!quantityInput) return;
 
-    const quantity =
-        parseInt(quantityInput.value) || 1;
+    let quantity = parseInt(quantityInput.value);
 
-    const total =
-        CONFIG.bookPrice * quantity;
-
-
-    /* Form price */
-
-    if (totalPriceInput) {
-
-        totalPriceInput.value =
-            formatPrice(total);
-
+    if (isNaN(quantity) || quantity < 1) {
+        quantity = 1;
+        quantityInput.value = 1;
     }
 
-
-    /* Summary quantity */
+    const total = CONFIG.bookPrice * quantity;
 
     if (summaryQuantity) {
-
-        summaryQuantity.textContent =
-            quantity;
-
+        summaryQuantity.textContent = quantity;
     }
-
-
-    /* Summary total */
 
     if (summaryTotal) {
-
         summaryTotal.textContent =
-            formatPrice(total);
-
+            `PKR ${total.toLocaleString()}`;
     }
 
+    if (totalPriceInput) {
+        totalPriceInput.value = total;
+    }
 }
 
 
-/* =========================================================
-   PRICE FORMAT
-========================================================= */
-
-function formatPrice(amount) {
-
-    return "Rs. " +
-        Number(amount).toLocaleString("en-PK");
-
-}
-
-
-/* =========================================================
-   QUANTITY CHANGE
-========================================================= */
+// Quantity change
 
 if (quantityInput) {
 
-    quantityInput.addEventListener(
-        "change",
-        updatePrice
-    );
+    quantityInput.addEventListener("input", updatePrice);
 
-    quantityInput.addEventListener(
-        "input",
-        updatePrice
-    );
+    quantityInput.addEventListener("change", updatePrice);
 
 }
 
 
-/* =========================================================
-   GENERATE UNIQUE ORDER CODE
-========================================================= */
+// ================================
+// ORDER CODE GENERATOR
+// ================================
 
 function generateOrderCode() {
 
-    const now =
-        new Date();
+    const now = new Date();
 
-    const year =
-        String(now.getFullYear()).slice(-2);
+    const year = String(now.getFullYear()).slice(-2);
 
-    const month =
-        String(now.getMonth() + 1).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
 
-    const day =
-        String(now.getDate()).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
 
     const random =
-        Math.floor(
-            1000 + Math.random() * 9000
-        );
+        Math.floor(1000 + Math.random() * 9000);
 
     return `WM-${year}${month}${day}-${random}`;
+}
+
+
+// ================================
+// PHONE VALIDATION
+// ================================
+
+function validatePhoneNumber(phone) {
+
+    if (!phone) return false;
+
+    const cleanedPhone =
+        phone.replace(/[\s\-()]/g, "");
+
+    const pakistanPhoneRegex =
+        /^(03\d{9}|\+923\d{9}|923\d{9})$/;
+
+    return pakistanPhoneRegex.test(cleanedPhone);
+}
+
+
+function validateOrderPhones() {
+
+    const phoneFields = [
+        {
+            id: "phone",
+            name: "Phone Number"
+        },
+        {
+            id: "whatsapp",
+            name: "WhatsApp Number"
+        },
+        {
+            id: "secondPhone",
+            name: "Second Phone Number"
+        }
+    ];
+
+    for (const field of phoneFields) {
+
+        const element =
+            document.getElementById(field.id);
+
+        if (!element) continue;
+
+        const value =
+            element.value.trim();
+
+        // Optional second phone
+        if (
+            field.id === "secondPhone" &&
+            value === ""
+        ) {
+            continue;
+        }
+
+        if (!validatePhoneNumber(value)) {
+
+            alert(
+                `Please enter a valid Pakistani ${field.name}.\n\nExample: 03001234567`
+            );
+
+            element.focus();
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+// ================================
+// COD WARNING MODAL
+// ================================
+
+function showCodWarning() {
+
+    if (!codWarningModal) return;
+
+    codWarningModal.classList.add("active");
+
+    codWarningModal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    document.body.classList.add("modal-open");
+}
+
+
+function hideCodWarning() {
+
+    if (!codWarningModal) return;
+
+    codWarningModal.classList.remove("active");
+
+    codWarningModal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    document.body.classList.remove("modal-open");
+}
+
+
+// Cancel button
+
+if (codCancel) {
+
+    codCancel.addEventListener("click", function () {
+
+        codConfirmed = false;
+
+        hideCodWarning();
+
+    });
 
 }
 
 
-/* =========================================================
-   FORM SUBMISSION
-========================================================= */
+// Top × button
 
-if (orderForm) {
+if (codCancelTop) {
 
-    orderForm.addEventListener(
-        "submit",
-        async function (event) {
+    codCancelTop.addEventListener("click", function () {
 
-            event.preventDefault();
+        codConfirmed = false;
 
+        hideCodWarning();
 
-            /* Make sure price is updated */
+    });
 
-            updatePrice();
+}
 
 
-            /* Generate order code */
+// Click outside popup
 
-            const orderCode =
-                generateOrderCode();
+if (codWarningModal) {
 
+    codWarningModal.addEventListener(
+        "click",
+        function (event) {
 
-            /* Get form values */
+            if (
+                event.target === codWarningModal ||
+                event.target.classList.contains("cod-backdrop")
+            ) {
 
-            const fullName =
-                document.getElementById("fullName").value.trim();
+                codConfirmed = false;
 
-            const email =
-                document.getElementById("email").value.trim();
-
-            const phone =
-                document.getElementById("phone").value.trim();
-
-            const whatsapp =
-                document.getElementById("whatsapp").value.trim();
-
-            const secondPhone =
-                document.getElementById("secondPhone").value.trim();
-
-            const address =
-                document.getElementById("address").value.trim();
-
-            const district =
-                document.getElementById("district").value.trim();
-
-            const tehsil =
-                document.getElementById("tehsil").value.trim();
-
-            const quantity =
-                parseInt(
-                    document.getElementById("quantity").value
-                ) || 1;
-
-            const note =
-                document.getElementById("note").value.trim();
-
-
-            /* Total */
-
-            const total =
-                CONFIG.bookPrice * quantity;
-
-
-            /* Order data */
-
-            const orderData = {
-
-                orderCode: orderCode,
-
-                fullName: fullName,
-
-                email: email,
-
-                phone: phone,
-
-                whatsapp: whatsapp,
-
-                secondPhone: secondPhone,
-
-                address: address,
-
-                district: district,
-
-                tehsil: tehsil,
-
-                quantity: quantity,
-
-                pricePerBook: CONFIG.bookPrice,
-
-                originalPrice: CONFIG.originalPrice,
-
-                totalPrice: total,
-
-                specialNote: note,
-
-                paymentStatus: "Pending",
-
-                orderStatus: "Order Placed",
-
-                orderDate:
-                    new Date().toLocaleString("en-PK")
-
-            };
-
-
-            /* Disable button */
-
-            const submitButton =
-                orderForm.querySelector(
-                    ".submit-order-btn"
-                );
-
-            const originalButtonText =
-                submitButton.textContent;
-
-
-            submitButton.disabled = true;
-
-            submitButton.textContent =
-                "Submitting Order...";
-
-
-            try {
-
-                /*
-                 * Send order to Google Apps Script
-                 *
-                 * اگر Google Script URL ابھی empty ہے
-                 * تو website local mode میں چل جائے گی۔
-                 */
-
-                if (CONFIG.googleScriptURL) {
-
-                    await submitToGoogleSheet(
-                        orderData
-                    );
-
-                }
-
-
-                /* Save locally as backup */
-
-                saveOrderLocally(orderData);
-
-
-                /* Show success modal */
-
-                showOrderSuccess(
-                    orderData
-                );
-
-
-                /* Reset form */
-
-                orderForm.reset();
-
-                updatePrice();
-
-
-            } catch (error) {
-
-                console.error(
-                    "Order submission error:",
-                    error
-                );
-
-
-                alert(
-                    "Order submit کرتے وقت مسئلہ آیا ہے۔ براہِ کرم دوبارہ کوشش کریں۔"
-                );
-
-
-            } finally {
-
-                submitButton.disabled = false;
-
-                submitButton.textContent =
-                    originalButtonText;
-
+                hideCodWarning();
             }
 
         }
@@ -419,17 +331,270 @@ if (orderForm) {
 }
 
 
-/* =========================================================
-   SEND DATA TO GOOGLE SHEET
-========================================================= */
+// ================================
+// MAIN FORM SUBMISSION
+// ================================
+
+if (orderForm) {
+
+    orderForm.addEventListener(
+        "submit",
+        function (event) {
+
+            event.preventDefault();
+
+            // Prevent double submission
+            if (isSubmitting) {
+                return;
+            }
+
+            // Validate phone numbers first
+            if (!validateOrderPhones()) {
+                return;
+            }
+
+            // Show COD warning before order submission
+            if (!codConfirmed) {
+
+                showCodWarning();
+
+                return;
+            }
+
+            // Continue with actual order
+            submitOrder();
+
+        }
+    );
+
+}
+
+
+// ================================
+// YES, CONTINUE
+// ================================
+
+if (codContinue) {
+
+    codContinue.addEventListener(
+        "click",
+        function () {
+
+            // Validate again for safety
+            if (!validateOrderPhones()) {
+                return;
+            }
+
+            codConfirmed = true;
+
+            hideCodWarning();
+
+            submitOrder();
+
+        }
+    );
+
+}
+
+
+// ================================
+// ACTUAL ORDER SUBMISSION
+// ================================
+
+async function submitOrder() {
+
+    if (!orderForm) return;
+
+    if (isSubmitting) return;
+
+    isSubmitting = true;
+
+    const submitButton =
+        orderForm.querySelector(
+            ".submit-order-btn"
+        );
+
+    const originalButtonText =
+        submitButton
+            ? submitButton.innerHTML
+            : "Place Order";
+
+    try {
+
+        updatePrice();
+
+        const orderCode =
+            generateOrderCode();
+
+        const fullName =
+            document.getElementById("fullName")?.value.trim() || "";
+
+        const email =
+            document.getElementById("email")?.value.trim() || "";
+
+        const phone =
+            document.getElementById("phone")?.value.trim() || "";
+
+        const whatsapp =
+            document.getElementById("whatsapp")?.value.trim() || "";
+
+        const secondPhone =
+            document.getElementById("secondPhone")?.value.trim() || "";
+
+        const address =
+            document.getElementById("address")?.value.trim() || "";
+
+        const district =
+            document.getElementById("district")?.value.trim() || "";
+
+        const tehsil =
+            document.getElementById("tehsil")?.value.trim() || "";
+
+        const quantity =
+            parseInt(quantityInput?.value) || 1;
+
+        const note =
+            document.getElementById("note")?.value.trim() || "";
+
+        const total =
+            CONFIG.bookPrice * quantity;
+
+
+        // ================================
+        // ORDER DATA
+        // ================================
+
+        const orderData = {
+
+            orderCode: orderCode,
+
+            fullName: fullName,
+
+            email: email,
+
+            phone: phone,
+
+            whatsapp: whatsapp,
+
+            secondPhone: secondPhone,
+
+            address: address,
+
+            district: district,
+
+            tehsil: tehsil,
+
+            quantity: quantity,
+
+            total: total,
+
+            note: note,
+
+            paymentStatus: "Pending",
+
+            orderStatus: "Order Placed",
+
+            paymentMethod: "Advance Payment",
+
+            cashOnDelivery: "Not Available",
+
+            date: new Date().toISOString()
+
+        };
+
+
+        // ================================
+        // BUTTON LOADING
+        // ================================
+
+        if (submitButton) {
+
+            submitButton.disabled = true;
+
+            submitButton.innerHTML =
+                "Processing Order...";
+
+        }
+
+
+        // ================================
+        // GOOGLE SHEETS
+        // ================================
+
+        if (CONFIG.googleScriptURL) {
+
+            await submitToGoogleSheet(orderData);
+
+        }
+
+
+        // ================================
+        // SAVE LOCALLY
+        // ================================
+
+        saveOrderLocally(orderData);
+
+
+        // ================================
+        // SHOW SUCCESS
+        // ================================
+
+        showOrderSuccess(orderData);
+
+
+        // ================================
+        // RESET FORM
+        // ================================
+
+        orderForm.reset();
+
+        codConfirmed = false;
+
+        updatePrice();
+
+
+    } catch (error) {
+
+        console.error(
+            "Order submission error:",
+            error
+        );
+
+        alert(
+            "Something went wrong while placing your order. Please try again."
+        );
+
+        codConfirmed = false;
+
+    } finally {
+
+        isSubmitting = false;
+
+        if (submitButton) {
+
+            submitButton.disabled = false;
+
+            submitButton.innerHTML =
+                originalButtonText;
+
+        }
+
+    }
+
+}
+
+
+// ================================
+// GOOGLE SHEETS SUBMISSION
+// ================================
 
 async function submitToGoogleSheet(orderData) {
 
-    const response =
+    try {
+
         await fetch(
             CONFIG.googleScriptURL,
             {
-
                 method: "POST",
 
                 mode: "no-cors",
@@ -439,26 +604,27 @@ async function submitToGoogleSheet(orderData) {
                         "application/json"
                 },
 
-                body:
-                    JSON.stringify(orderData)
-
+                body: JSON.stringify(orderData)
             }
         );
 
+    } catch (error) {
 
-    /*
-     * no-cors response کو browser read نہیں کر سکتا،
-     * لیکن request Google Script تک پہنچ جائے گی۔
-     */
+        console.error(
+            "Google Sheets submission error:",
+            error
+        );
 
-    return response;
+        throw error;
+
+    }
 
 }
 
 
-/* =========================================================
-   SAVE ORDER LOCALLY
-========================================================= */
+// ================================
+// SAVE ORDER LOCALLY
+// ================================
 
 function saveOrderLocally(orderData) {
 
@@ -471,15 +637,12 @@ function saveOrderLocally(orderData) {
                 )
             ) || [];
 
-
         existingOrders.push(orderData);
-
 
         localStorage.setItem(
             "waliMuhammadOrders",
             JSON.stringify(existingOrders)
         );
-
 
     } catch (error) {
 
@@ -493,48 +656,36 @@ function saveOrderLocally(orderData) {
 }
 
 
-/* =========================================================
-   SHOW ORDER SUCCESS MODAL
-========================================================= */
+// ================================
+// SUCCESS MODAL
+// ================================
 
 function showOrderSuccess(orderData) {
 
     if (!orderModal) return;
 
+    if (generatedOrderCode) {
 
-    /* Order code */
+        generatedOrderCode.textContent =
+            orderData.orderCode;
 
-    generatedOrderCode.textContent =
-        orderData.orderCode;
-
-
-    /* Instagram URL */
-
-    const instagramURL =
-        `https://instagram.com/${CONFIG.instagramUsername}`;
+    }
 
 
-    modalInstagram.href =
-        instagramURL;
+    // Instagram
+
+    if (modalInstagram) {
+
+        modalInstagram.href =
+            `https://instagram.com/${CONFIG.instagramUsername}`;
+
+    }
 
 
-    /*
-     * WhatsApp confirmation message
-     */
+    // WhatsApp
 
     const whatsappMessage =
-        `Assalam-o-Alaikum, I have placed an order for Wali Muhammad.
-
-Order Code: ${orderData.orderCode}
-
-Name: ${orderData.fullName}
-
-Quantity: ${orderData.quantity}
-
-Total: Rs. ${orderData.totalPrice.toLocaleString("en-PK")}
-
-I am sending my payment proof for order confirmation.`;
-
+        `Hello Muhammad Faizan, I have placed an order for Wali Muhammad.\n\nOrder Code: ${orderData.orderCode}\nName: ${orderData.fullName}\nQuantity: ${orderData.quantity}\nTotal: PKR ${orderData.total}`;
 
     const whatsappURL =
         `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(
@@ -542,11 +693,13 @@ I am sending my payment proof for order confirmation.`;
         )}`;
 
 
-    modalWhatsApp.href =
-        whatsappURL;
+    if (modalWhatsApp) {
 
+        modalWhatsApp.href =
+            whatsappURL;
 
-    /* Open modal */
+    }
+
 
     orderModal.classList.add("active");
 
@@ -555,51 +708,41 @@ I am sending my payment proof for order confirmation.`;
         "false"
     );
 
-    document.body.classList.add(
-        "modal-open"
-    );
+    document.body.classList.add("modal-open");
 
 }
 
 
-/* =========================================================
-   CLOSE MODAL
-========================================================= */
-
-function hideOrderModal() {
-
-    if (!orderModal) return;
-
-
-    orderModal.classList.remove(
-        "active"
-    );
-
-    orderModal.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-    document.body.classList.remove(
-        "modal-open"
-    );
-
-}
-
+// ================================
+// CLOSE SUCCESS MODAL
+// ================================
 
 if (closeModal) {
 
     closeModal.addEventListener(
         "click",
-        hideOrderModal
+        function () {
+
+            if (!orderModal) return;
+
+            orderModal.classList.remove("active");
+
+            orderModal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            document.body.classList.remove(
+                "modal-open"
+            );
+
+        }
     );
 
 }
 
 
-/* =========================================================
-   CLOSE MODAL BY BACKDROP
-========================================================= */
+// Click outside success modal
 
 if (orderModal) {
 
@@ -608,12 +751,21 @@ if (orderModal) {
         function (event) {
 
             if (
-                event.target.classList.contains(
-                    "modal-backdrop"
-                )
+                event.target === orderModal
             ) {
 
-                hideOrderModal();
+                orderModal.classList.remove(
+                    "active"
+                );
+
+                orderModal.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+
+                document.body.classList.remove(
+                    "modal-open"
+                );
 
             }
 
@@ -623,31 +775,9 @@ if (orderModal) {
 }
 
 
-/* =========================================================
-   ESC KEY CLOSE MODAL
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    function (event) {
-
-        if (
-            event.key === "Escape" &&
-            orderModal &&
-            orderModal.classList.contains("active")
-        ) {
-
-            hideOrderModal();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   COPY ORDER CODE
-========================================================= */
+// ================================
+// COPY ORDER CODE
+// ================================
 
 if (copyOrderCode) {
 
@@ -656,8 +786,9 @@ if (copyOrderCode) {
         async function () {
 
             const code =
-                generatedOrderCode.textContent.trim();
+                generatedOrderCode?.textContent.trim();
 
+            if (!code) return;
 
             try {
 
@@ -665,63 +796,24 @@ if (copyOrderCode) {
                     code
                 );
 
-
-                const originalText =
-                    copyOrderCode.textContent;
-
-
                 copyOrderCode.textContent =
-                    "Copied ✓";
-
+                    "Copied!";
 
                 setTimeout(
-                    () => {
+                    function () {
 
                         copyOrderCode.textContent =
-                            originalText;
+                            "Copy Order Code";
 
                     },
-                    1500
+                    2000
                 );
-
 
             } catch (error) {
 
-                /*
-                 * Fallback for older browsers
-                 */
-
-                const tempInput =
-                    document.createElement("input");
-
-                tempInput.value =
-                    code;
-
-                document.body.appendChild(
-                    tempInput
-                );
-
-                tempInput.select();
-
-                document.execCommand(
-                    "copy"
-                );
-
-                tempInput.remove();
-
-
-                copyOrderCode.textContent =
-                    "Copied ✓";
-
-
-                setTimeout(
-                    () => {
-
-                        copyOrderCode.textContent =
-                            "Copy Code";
-
-                    },
-                    1500
+                console.error(
+                    "Copy failed:",
+                    error
                 );
 
             }
@@ -732,32 +824,21 @@ if (copyOrderCode) {
 }
 
 
-/* =========================================================
-   CONTACT LINKS
-========================================================= */
+// ================================
+// CONTACT LINKS
+// ================================
 
 function updateContactLinks() {
 
-    /*
-     * WhatsApp
-     */
-
     if (whatsappLink) {
 
-        const message =
-            "Assalam-o-Alaikum, I have placed an order for Wali Muhammad. Please guide me regarding order confirmation.";
+        const url =
+            `https://wa.me/${CONFIG.whatsappNumber}`;
 
-        whatsappLink.href =
-            `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(
-                message
-            )}`;
+        whatsappLink.href = url;
 
     }
 
-
-    /*
-     * Email
-     */
 
     if (emailLink) {
 
@@ -769,9 +850,9 @@ function updateContactLinks() {
 }
 
 
-/* =========================================================
-   BANK DETAILS
-========================================================= */
+// ================================
+// BANK DETAILS
+// ================================
 
 function updateBankDetails() {
 
@@ -795,7 +876,6 @@ function updateBankDetails() {
 
     }
 
-
     if (accountTitle) {
 
         accountTitle.textContent =
@@ -803,14 +883,12 @@ function updateBankDetails() {
 
     }
 
-
     if (accountNumber) {
 
         accountNumber.textContent =
             CONFIG.accountNumber;
 
     }
-
 
     if (iban) {
 
@@ -822,27 +900,47 @@ function updateBankDetails() {
 }
 
 
-/* =========================================================
-   PDF LINKS
-========================================================= */
+// ================================
+// PDF LINKS
+// ================================
 
 function updatePDFLinks() {
 
-    const pdfCards =
-        document.querySelectorAll(
-            ".pdf-card"
-        );
+    const pdfUrdu =
+        document.getElementById("pdfUrdu");
+
+    const pdfEnglish =
+        document.getElementById("pdfEnglish");
+
+    const pdfRomanUrdu =
+        document.getElementById("pdfRomanUrdu");
 
 
-    if (pdfCards.length >= 3) {
+    if (pdfUrdu) {
 
-        pdfCards[0].href =
+        pdfUrdu.href =
             CONFIG.pdfUrdu;
 
-        pdfCards[1].href =
+    }
+
+
+    if (
+        pdfEnglish &&
+        CONFIG.pdfEnglish !== "#"
+    ) {
+
+        pdfEnglish.href =
             CONFIG.pdfEnglish;
 
-        pdfCards[2].href =
+    }
+
+
+    if (
+        pdfRomanUrdu &&
+        CONFIG.pdfRomanUrdu !== "#"
+    ) {
+
+        pdfRomanUrdu.href =
             CONFIG.pdfRomanUrdu;
 
     }
@@ -850,224 +948,73 @@ function updatePDFLinks() {
 }
 
 
-/* =========================================================
-   PHONE NUMBER BASIC VALIDATION
-========================================================= */
+// ================================
+// CURRENT YEAR
+// ================================
 
-function validatePhoneNumber(number) {
+function setCurrentYear() {
 
-    /*
-     * Pakistan mobile number:
-     * 03XXXXXXXXX
-     * or
-     * +923XXXXXXXXX
-     */
+    if (currentYear) {
 
-    const pattern =
-        /^(03\d{9}|\+923\d{9}|923\d{9})$/;
-
-    return pattern.test(
-        number.replace(/\s+/g, "")
-    );
-
-}
-
-
-/* =========================================================
-   PHONE VALIDATION ON SUBMIT
-========================================================= */
-
-if (orderForm) {
-
-    orderForm.addEventListener(
-        "submit",
-        function (event) {
-
-            const phone =
-                document.getElementById(
-                    "phone"
-                ).value.trim();
-
-            const whatsapp =
-                document.getElementById(
-                    "whatsapp"
-                ).value.trim();
-
-            const secondPhone =
-                document.getElementById(
-                    "secondPhone"
-                ).value.trim();
-
-
-            if (!validatePhoneNumber(phone)) {
-
-                event.preventDefault();
-
-                alert(
-                    "براہِ کرم درست Phone Number درج کریں۔ مثال: 03001234567"
-                );
-
-                document
-                    .getElementById("phone")
-                    .focus();
-
-                return;
-
-            }
-
-
-            if (!validatePhoneNumber(whatsapp)) {
-
-                event.preventDefault();
-
-                alert(
-                    "براہِ کرم درست WhatsApp Number درج کریں۔ مثال: 03001234567"
-                );
-
-                document
-                    .getElementById("whatsapp")
-                    .focus();
-
-                return;
-
-            }
-
-
-            if (!validatePhoneNumber(secondPhone)) {
-
-                event.preventDefault();
-
-                alert(
-                    "براہِ کرم درست Second Phone Number درج کریں۔"
-                );
-
-                document
-                    .getElementById("secondPhone")
-                    .focus();
-
-                return;
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   NAVIGATION ACTIVE EFFECT
-========================================================= */
-
-const sections =
-    document.querySelectorAll(
-        "section[id]"
-    );
-
-const navigationLinks =
-    document.querySelectorAll(
-        ".nav-links a"
-    );
-
-
-window.addEventListener(
-    "scroll",
-    () => {
-
-        let currentSection = "";
-
-
-        sections.forEach(
-            section => {
-
-                const sectionTop =
-                    section.offsetTop - 120;
-
-                const sectionHeight =
-                    section.offsetHeight;
-
-
-                if (
-                    window.scrollY >= sectionTop &&
-                    window.scrollY <
-                    sectionTop + sectionHeight
-                ) {
-
-                    currentSection =
-                        section.getAttribute("id");
-
-                }
-
-            }
-        );
-
-
-        navigationLinks.forEach(
-            link => {
-
-                link.classList.remove(
-                    "active"
-                );
-
-
-                if (
-                    link.getAttribute("href") ===
-                    `#${currentSection}`
-                ) {
-
-                    link.classList.add(
-                        "active"
-                    );
-
-                }
-
-            }
-        );
+        currentYear.textContent =
+            new Date().getFullYear();
 
     }
-);
+
+}
 
 
-/* =========================================================
-   PREVENT ACCIDENTAL DOUBLE SUBMISSION
-========================================================= */
+// ================================
+// ESCAPE KEY FOR MODALS
+// ================================
 
-let isSubmitting = false;
+document.addEventListener(
+    "keydown",
+    function (event) {
 
-if (orderForm) {
-
-    orderForm.addEventListener(
-        "submit",
-        function () {
-
-            if (isSubmitting) {
-
-                return;
-
-            }
-
-            isSubmitting = true;
+        if (event.key !== "Escape") {
+            return;
+        }
 
 
-            setTimeout(
-                () => {
+        // COD warning
 
-                    isSubmitting = false;
+        if (
+            codWarningModal &&
+            codWarningModal.classList.contains("active")
+        ) {
 
-                },
-                5000
+            codConfirmed = false;
+
+            hideCodWarning();
+
+        }
+
+
+        // Success modal
+
+        if (
+            orderModal &&
+            orderModal.classList.contains("active")
+        ) {
+
+            orderModal.classList.remove(
+                "active"
+            );
+
+            orderModal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            document.body.classList.remove(
+                "modal-open"
             );
 
         }
-    );
 
-}
-
-
-/* =========================================================
-   CONSOLE MESSAGE
-========================================================= */
-
+    }
+);
 console.log(
     "Wali Muhammad Official Novel Store loaded successfully."
 );
