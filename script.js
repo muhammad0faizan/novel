@@ -16,7 +16,7 @@ const CONFIG = {
     email: "your-email@gmail.com",
 
     googleScriptURL:
-        "https://script.google.com/macros/s/AKfycbzE8nneKtC21jXg8IhEYXnvqqyU8OvwMIOWFbnrCmcPF9KNNsGHc5zJddAwf-mG2uDxJw/exec",
+        "https://script.google.com/macros/s/AKfycbwyAlJBL1eW3deaBkjMjmVZ43QjYeGXdrk-riqH3ZBEg94gaEgA5T6kvf50lzy_FdgkYA/exec",
 
     bankName: "United Bank Limited (UBL)",
     accountTitle: "Muhammad Faizan",
