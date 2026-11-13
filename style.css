@@ -364,7 +364,7 @@ img {
 .hero-urdu {
     margin-bottom: 25px;
 
-    font-family: "Noto Naskh Arabic", serif;
+    font-family: 'Inter', sans-serif;
 
     color: var(--gold-light);
 
